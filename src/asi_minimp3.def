@@ -1,0 +1,3 @@
+LIBRARY mssmp3
+EXPORTS
+    "_RIB_Main@8" = RIB_Main@8

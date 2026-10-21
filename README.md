@@ -29,8 +29,8 @@ reloading, construction, input and normal exit worked. One intermittent menu
 crash remains unresolved; precision trade-offs and long-session limits apply.
 This is a developer reproduction, not a ready-made installer. See the
 [measured graphics settings](docs/GRAPHICS.md) for a tested quality preset near
-60 fps at 1728x1080 in the small match. The CrossOver instructions below remain
-separate.
+60 fps at 2056x1285 in macOS fullscreen in the small match. The CrossOver
+instructions below remain separate.
 
 ## What the code changes
 

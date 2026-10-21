@@ -26,7 +26,9 @@ window, Low shader/object/water/clutter/view-range settings, High textures,
 antialiasing, shadows, SSAO and particles disabled. Saved depth-of-field, fog
 and terrain-detail flags remained enabled, although the Low shader tier can
 suppress higher-tier effects. These settings are a tested baseline, not an
-optimized graphics recommendation.
+optimized graphics recommendation. See the later
+[graphics tuning measurements](../../docs/GRAPHICS.md) for a tested 1728x1080
+quality preset and the cost of particles and shadows.
 
 Camera movement, lodge construction, material delivery, a new named save,
 reload after a fresh launch, normal exit and reopening while Steam remained

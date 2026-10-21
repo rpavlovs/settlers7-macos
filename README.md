@@ -27,8 +27,10 @@ launch-environment template. In a small match on the same M1 Max, reduced x87
 precision gave approximately 90–98 fps in stationary HUD observations. Saving,
 reloading, construction, input and normal exit worked. One intermittent menu
 crash remains unresolved; precision trade-offs and long-session limits apply.
-This is a developer reproduction, not a ready-made installer. The CrossOver
-instructions below remain separate.
+This is a developer reproduction, not a ready-made installer. See the
+[measured graphics settings](docs/GRAPHICS.md) for a tested quality preset near
+60 fps at 1728x1080 in the small match. The CrossOver instructions below remain
+separate.
 
 ## What the code changes
 

@@ -29,8 +29,13 @@ late-game settlements.
 On the test display, 2056 x 1285 fills the usable area in macOS fullscreen,
 below the display's notch strip. Lower game resolutions can leave black margins
 in this mode. This resolution is specific to the tested display configuration,
-not a universal minimum for every Mac. Use the macOS window fullscreen control;
-the game's saved `FullScreen` flag remained `0` in this test.
+not a universal minimum for every Mac. Keep the game's saved `FullScreen` flag
+at `0`, enter fullscreen with the macOS window control, then check the game's
+Video Settings. On a later fresh launch, macOS fullscreen initially retained a
+2056 x 1262 client. Reapplying 2056 x 1285 and 16:10 inside fullscreen expanded
+the client to the requested size. Accept a resolution confirmation within
+15 seconds if one appears. This manual workflow was verified; automatic
+fullscreen is discussed below.
 
 The game was checked visually across the display, and native Metal statistics
 confirmed a 2056 x 1285 rendering surface. With the preset above, a 20-second
@@ -38,6 +43,16 @@ stationary test averaged **60.3 fps** over 19 seconds of complete samples.
 The two short camera routes averaged **57.0 and 59.3 fps**. The longest display
 interval in the retained measurement samples was 46 ms. These results followed
 a successful reload of a later checkpoint in the same small Forest Realm match.
+
+A later fresh-launch recovery check on the built-in display used the same
+quality settings with **depth of field on**. It averaged **58.7 fps stationary**
+and **58.4 / 60.4 fps** on the camera routes at a verified 2056 x 1285 Metal
+surface. Stationary coverage was 95 percent; camera-route coverage was 97 and
+84 percent. The lowest one-second stationary average was 43.9 fps and the
+longest retained display interval was 70 ms. The restored options had depth of field off before launch, but it was on in the benchmark's
+saved options; the step that re-enabled it was not isolated. These results
+confirm playable recovery in the test match. They do not identify the cause of
+the earlier severe slowdown or prove that it cannot recur.
 
 The game's Upscaling setting is reported by its UI name. Its internal rendering
 scale was not established. Back up your options before changing them, apply
@@ -77,6 +92,15 @@ which [maps to the primary display](https://github.com/pythonlover02/dxvk-sarek/
 Its activation handler also minimizes the game on focus loss. A verified way
 to select the external monitor for this exclusive mode is still missing.
 Keyboard and pointer focus remain shared between both displays.
+
+A subsequent primary-display test with `FullScreen=1`, 2056 x 1285 and 16:10
+did automatically display the game fullscreen. During input checks, macOS
+reported the game as foreground while its Windows window was minimized and a
+different Windows process held focus. A normal Windows restore operation was
+tried, and gameplay was later visible, but the test ended before input,
+performance and focus-return verification were complete. The saved setting
+was restored to the measured `FullScreen=0` configuration. A reliable automatic
+fullscreen workflow with `FullScreen=1` therefore remains unverified.
 
 ## Earlier windowed measurements
 

@@ -62,12 +62,18 @@ cases, but this is recovery from the symptom, not a fix. A borderless-window
 comparison has not established a reliable alternative. There is no valid
 external-fullscreen average to compare with the laptop results above.
 
+The borderless stall also reproduced with the original installed native driver.
+During a 12-second check, the game stayed foreground, its start and end images
+were identical, and the native driver logged no presentation calls. The problem
+is therefore not limited to the locally rebuilt driver. A frozen FPS overlay
+does not provide a valid frame-rate measurement for this interval.
+
 A test with `FullScreen=1` opened on the primary laptop display despite the
 intended external display. The game requested 1920 x 1200 after the options
 had been set to 1920 x 1080. The old 16:10 aspect option was still present;
 the reason for the mode substitution was not isolated. In the pinned Sarek build,
-[fullscreen entry selects the default monitor](https://github.com/pythonlover02/dxvk-sarek/blob/v1.14.1/src/d3d9/d3d9_swapchain.cpp#L1151),
-which [maps to the primary display](https://github.com/pythonlover02/dxvk-sarek/blob/v1.14.1/src/wsi/win32/wsi_monitor_win32.cpp#L7).
+[fullscreen entry selects the default monitor](https://github.com/pythonlover02/dxvk-sarek/blob/0c0e8f6f62c7cb37dbf5d38413517efa00c08fef/src/d3d9/d3d9_swapchain.cpp#L1266),
+which [maps to the primary display](https://github.com/pythonlover02/dxvk-sarek/blob/0c0e8f6f62c7cb37dbf5d38413517efa00c08fef/src/wsi/win32/wsi_monitor_win32.cpp#L9).
 Its activation handler also minimizes the game on focus loss. A verified way
 to select the external monitor for this exclusive mode is still missing.
 Keyboard and pointer focus remain shared between both displays.

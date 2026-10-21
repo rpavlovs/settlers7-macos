@@ -4,7 +4,7 @@ These measurements apply to the [patched ARM64/FEX setup](../experimental/arm64-
 with reduced x87 precision enabled. They do not describe the separate CrossOver
 installation. Test hardware was an M1 Max with 32 GPU cores and 32 GB memory;
 the game was History Edition 1.12.1395.0, using DXVK-Sarek 1.14.1 and the bundled
-Highball MoltenVK. Testing was performed on 21 October 2026.
+Highball MoltenVK. Testing was performed on 21 and 22 October 2026.
 
 ## Tested fullscreen quality preset
 
@@ -101,6 +101,28 @@ tried, and gameplay was later visible, but the test ended before input,
 performance and focus-return verification were complete. The saved setting
 was restored to the measured `FullScreen=0` configuration. A reliable automatic
 fullscreen workflow with `FullScreen=1` therefore remains unverified.
+
+Further built-in-display tests isolated a startup geometry mismatch. Before
+native activation, the guest window and client were 2056 x 1329. Activation
+changed the display mode to 2056 x 1285 while leaving the guest client and
+Metal surface at 2056 x 1329. Correcting only the client restored visible menu
+clicks and save loading, but left the larger Metal surface. That run averaged
+59.7 fps stationary and 44.9 / 45.8 fps on camera routes, worse than the measured
+manual fullscreen recovery above. Resizing the window alone is therefore not
+the recommended fix.
+
+Selecting the supported 2056 x 1285 display mode through native CoreGraphics
+before starting the game kept the display, guest client and Metal surface at
+2056 x 1285. Visible clicks and loading the saved match worked without a later
+resize correction. A temporary launcher that holds this mode for the game
+process also released it after normal game exit, restoring the original desktop
+mode. Normal app startup, gameplay performance and cursor behavior for this
+launcher remain unverified, so it is not included as a recommended launcher.
+The manual `FullScreen=0` workflow above remains the measured fallback.
+
+The per-game Wine `EmulateModeset=Y` alternative failed before rendering with a
+`make_ratio` assertion in `sysparams.c`; the test setting was removed. It is not
+a working workaround for this tested configuration.
 
 ## Earlier windowed measurements
 

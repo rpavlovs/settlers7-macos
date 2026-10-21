@@ -31,3 +31,13 @@ disassembly, saves, screenshots and machine logs are not part of this release.
 
 Miles Sound System and the game remain the work of their respective owners.
 This project has no affiliation with or endorsement from those owners.
+
+## ARM64/FEX experiment
+
+The [experimental bundle](experimental/arm64-fex/README.md) builds on
+Highball's ARM64 r6 integration, Wine 11.18 and FEX 2610. Its CEF compatibility
+patch adapts CodeWeavers' CW HACK 25737 from the published CrossOver 26.3
+sources. Wine-derived patches retain LGPL-2.1-or-later licensing; FEX's MIT
+notice is included. Exact source pins, patch order, licenses and the distinction
+between observed fixes and unresolved hypotheses are documented in
+[BUILD.md](experimental/arm64-fex/BUILD.md).

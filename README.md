@@ -1,10 +1,11 @@
 # Settlers 7 on macOS
 
 Experimental compatibility code for **The Settlers 7: History Edition**, the
-Windows Steam release, on Apple Silicon with CrossOver. No virtual machine is
-needed for the tested setup.
+Windows Steam release, on Apple Silicon. Two tested paths are documented:
+CrossOver and an experimental native ARM64 Wine/FEX engine. Neither uses a
+virtual machine.
 
-This source release combines an MP3 decoder adapter, a process-local Wine DEP
+The CrossOver path combines an MP3 decoder adapter, a process-local Wine DEP
 workaround, and a launcher for a tested DXVK-Sarek/MoltenVK configuration.
 It requires your own installed game, its existing Miles sound library, Steam,
 Ubisoft Connect, and CrossOver. It does not include game files or change
@@ -17,6 +18,17 @@ with dips to 13–17 fps. The animated main menu remained around 5–8 fps.
 These are snapshots, not a controlled FPS average. Long sessions, large maps
 and other Macs are untested. See [validation and limits](docs/VALIDATION.md)
 for the distinction between that gameplay test and this cleaned source build.
+
+## Native ARM64 / FEX experiment
+
+The [experimental ARM64/FEX source bundle](experimental/arm64-fex/README.md)
+adds four pinned runtime patches, build notes, two focused reproductions and a
+launch-environment template. In a small match on the same M1 Max, reduced x87
+precision gave approximately 90–98 fps in stationary HUD observations. Saving,
+reloading, construction, input and normal exit worked. One intermittent menu
+crash remains unresolved; precision trade-offs and long-session limits apply.
+This is a developer reproduction, not a ready-made installer. The CrossOver
+instructions below remain separate.
 
 ## What the code changes
 
@@ -149,6 +161,8 @@ patches, including CPU-affinity changes.
 [OpenMiles](https://github.com/maci0/openmiles) replaces the broader Miles sound
 library. Neither was tested in this setup. This project keeps a narrower scope.
 
-Original compatibility code is [MIT licensed](LICENSE). Vendored minimp3 is
+Original compatibility code is [MIT licensed](LICENSE). The experimental Wine
+patches are LGPL-2.1-or-later and the FEX patch is MIT; their notices are included
+in the [source bundle](experimental/arm64-fex/BUILD.md#licensing-and-provenance). Vendored minimp3 is
 [CC0-1.0](vendor/minimp3/LICENSE). See [CREDITS.md](CREDITS.md) for provenance and
 upstream references. This is an independent, unofficial compatibility project.

@@ -1,0 +1,46 @@
+--- a/dlls/ntdll/sync.c
++++ b/dlls/ntdll/sync.c
+@@ -31,6 +31,7 @@
+ #include "ntstatus.h"
+ #include "windef.h"
+ #include "winternl.h"
++#include "ddk/wdm.h"
+ #include "wine/debug.h"
+ #include "wine/list.h"
+ #include "wine/exception.h"
+@@ -906,8 +907,34 @@
+ 
+     spin_unlock( &queue->lock );
+ 
+-    ret = NtWaitForAlertByThreadId( NULL, timeout );
++#ifdef __i386__
++    /* Experimental ARM64 WoW64 recovery for a selected wake whose per-thread
++     * alert did not complete the translated wait; the consumer is unproven.
++     * Recheck only completed wake selection; do not change lock ownership or
++     * the semantics of finite waits. */
++    if (!timeout && user_shared_data->NativeProcessorArchitecture == PROCESSOR_ARCHITECTURE_ARM64)
++    {
++        const LARGE_INTEGER slice = { .QuadPart = -1000000 };
++        BOOL selected;
+ 
++        for (;;)
++        {
++            ret = NtWaitForAlertByThreadId( NULL, &slice );
++            if (ret != STATUS_TIMEOUT) break;
++            spin_lock( &queue->lock );
++            selected = !entry.addr;
++            spin_unlock( &queue->lock );
++            if (selected)
++            {
++                ret = STATUS_SUCCESS;
++                break;
++            }
++        }
++    }
++    else
++#endif
++        ret = NtWaitForAlertByThreadId( NULL, timeout );
++
+     /* We may have already been removed by a call to RtlWakeAddressSingle() or RtlWakeAddressAll(). */
+     if (entry.addr)
+     {

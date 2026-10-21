@@ -1,0 +1,21 @@
+--- a/Source/Windows/Common/InvalidationTracker.cpp
++++ b/Source/Windows/Common/InvalidationTracker.cpp
+@@ -95,6 +95,9 @@
+       }
+       if (DEPDisabled && !HasExec) {
+         DEPPromotedIntervals.Insert(ProtInterval);
++      } else {
++        // Explicit execute permission must survive a later DEP-enable transition.
++        DEPPromotedIntervals.Remove(ProtInterval);
+       }
+       return true;
+     } else if (XIntervals.Intersect(ProtInterval)) {
+@@ -175,6 +178,8 @@
+       uint64_t SectionBase = Address + Section->VirtualAddress;
+       uint64_t SectionEnd = SectionBase + Section->Misc.VirtualSize;
+       XIntervals.Insert({SectionBase, SectionEnd});
++      // Image execute permission does not depend on the process DEP policy.
++      DEPPromotedIntervals.Remove({SectionBase, SectionEnd});
+       LastExecutableSectionEnd = std::max(LastExecutableSectionEnd, SectionEnd);
+       if (Section->Characteristics & IMAGE_SCN_MEM_WRITE) {
+         LogMan::Msg::DFmt("Add image SMC interval: {:X} - {:X}", SectionBase, SectionBase + Section->Misc.VirtualSize);

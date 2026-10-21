@@ -93,3 +93,14 @@ cross-machine or long-session validation of this release.
   could fail with DEP enabled. The tested game path worked; other paths are untested.
 - Native Windows, Intel Macs, other Apple GPUs, other game/Miles versions, larger
   maps and prolonged play have not been validated.
+
+## Native ARM64/FEX follow-up, 21 October 2026
+
+A separate Highball ARM64 r6 prefix used the exact cleaned release MP3/DEP
+adapter during actual gameplay. The [experimental source bundle](../experimental/arm64-fex/README.md)
+records four additional runtime patches, full versus reduced x87 observations,
+construction and save/reload verification, launch/exit behavior, and one
+unresolved menu crash. It used bundled Highball MoltenVK, not the CrossOver
+library above. This extends gameplay evidence to that specific patched FEX
+configuration; it does not establish the cleaned CrossOver launcher's full
+gameplay validation or cross-machine/long-session stability.

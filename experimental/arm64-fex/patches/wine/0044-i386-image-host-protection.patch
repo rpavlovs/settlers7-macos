@@ -1,0 +1,34 @@
+--- a/dlls/ntdll/unix/virtual.c
++++ b/dlls/ntdll/unix/virtual.c
+@@ -143,6 +143,7 @@
+ #define VPROT_SYSTEM           0x0200  /* system view (underlying mmap not under our control) */
+ #define VPROT_PLACEHOLDER      0x0400
+ #define VPROT_FREE_PLACEHOLDER 0x0800
++#define VPROT_EMULATED_I386    0x1000  /* plain i386 PE image, executed by the CPU emulator */
+ 
+ 
+ /* Conversion from VPROT_* to Win32 flags */
+@@ -2087,6 +2088,11 @@
+ static inline int mprotect_exec( void *base, size_t size, int unix_prot )
+ {
+ #ifdef HB_JIT
++    struct file_view *image_view = find_view( base, size );
++
++    /* Emulated image code is read by FEX, never executed directly by the host. */
++    if (image_view && (image_view->protect & VPROT_EMULATED_I386))
++        return mprotect( base, size, unix_prot & ~PROT_EXEC );
+     if ((unix_prot & PROT_EXEC) && (unix_prot & PROT_WRITE))
+     {
+         struct file_view *view = find_view( base, 0 );
+@@ -3488,6 +3494,11 @@
+     ULONG_PTR start, end;
+     BOOL top_down = (image_info->image_charact & IMAGE_FILE_DLL) &&
+                     (image_info->image_flags & IMAGE_FLAGS_ImageDynamicallyRelocated);
++
++#ifdef HB_JIT
++    if (image_info->machine == IMAGE_FILE_MACHINE_I386 && !image_info->is_hybrid)
++        vprot |= VPROT_EMULATED_I386;
++#endif
+ 
+     limit_low = max( limit_low, (ULONG_PTR)address_space_start );  /* make sure the DOS area remains free */
+     if (!limit_high) limit_high = (ULONG_PTR)user_space_limit;

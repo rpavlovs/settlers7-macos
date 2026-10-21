@@ -30,8 +30,7 @@ On the test display, 2056 x 1285 fills the usable area in macOS fullscreen,
 below the display's notch strip. Lower game resolutions can leave black margins
 in this mode. This resolution is specific to the tested display configuration,
 not a universal minimum for every Mac. Use the macOS window fullscreen control;
-the game's saved `FullScreen` flag remained `0` in this test. Wine's separate
-exclusive fullscreen mode was not validated.
+the game's saved `FullScreen` flag remained `0` in this test.
 
 The game was checked visually across the display, and native Metal statistics
 confirmed a 2056 x 1285 rendering surface. With the preset above, a 20-second
@@ -44,6 +43,34 @@ The game's Upscaling setting is reported by its UI name. Its internal rendering
 scale was not established. Back up your options before changing them, apply
 settings, and reload the map when prompted. Check that the intended controls
 and saved options actually changed.
+
+## External display and the FullScreen option
+
+**External fullscreen is still under investigation.** The tests below do not
+establish a reliable external-display setup or a performance recommendation.
+
+A later test used `FullScreen=0`, `ScreenWidth=1920`, `ScreenHeight=1080` and
+16:9 (`AspectMode=4`) in the game's `Options.ini`. After moving the game to the
+external display, the macOS fullscreen control filled its 1920 x 1080 logical
+area. The panel's physical resolution was 3840 x 2160; the renderer reported a
+1920 x 1080 buffer. Accept the game's resolution confirmation within 15 seconds
+or it reverts. The tested change was accepted and the saved options verified.
+
+This native fullscreen path also produced a black transition and later long
+presentation stalls. Leaving fullscreen restored responsiveness in observed
+cases, but this is recovery from the symptom, not a fix. A borderless-window
+comparison has not established a reliable alternative. There is no valid
+external-fullscreen average to compare with the laptop results above.
+
+A test with `FullScreen=1` opened on the primary laptop display despite the
+intended external display. The game requested 1920 x 1200 after the options
+had been set to 1920 x 1080. The old 16:10 aspect option was still present;
+the reason for the mode substitution was not isolated. In the pinned Sarek build,
+[fullscreen entry selects the default monitor](https://github.com/pythonlover02/dxvk-sarek/blob/v1.14.1/src/d3d9/d3d9_swapchain.cpp#L1151),
+which [maps to the primary display](https://github.com/pythonlover02/dxvk-sarek/blob/v1.14.1/src/wsi/win32/wsi_monitor_win32.cpp#L7).
+Its activation handler also minimizes the game on focus loss. A verified way
+to select the external monitor for this exclusive mode is still missing.
+Keyboard and pointer focus remain shared between both displays.
 
 ## Earlier windowed measurements
 
@@ -124,11 +151,23 @@ Existing DXVK and MoltenVK caches were already populated. No speculative cache
 or synchronization change was applied, and this guide does not claim to fix all
 stutter.
 
-Cursor changes to the macOS arrow after clicking and transient severe lag have
-also been reported in macOS fullscreen. Bounded automated left- and right-click
-tests retained the custom game cursor, and subsequent foreground samples did
-not reproduce continuous severe lag. Both reports remain unresolved; the
-successful short FPS measurements do not establish that they are fixed.
+A brief macOS-arrow flash after left-click was later reproduced in continuous
+video. Earlier delayed screenshots missed it. A ten-second recording with four
+stationary native clicks in macOS fullscreen showed the arrow after every click;
+one click was held for half a second. Simultaneous Wine cursor tracing mapped
+the requested shapes to the game's hand and fist resources, with no system-arrow
+request during
+those clicks. This supports investigating native cursor restoration, but does
+not by itself establish a fix. Later windowed recordings with both an experimental
+cursor patch and an unmodified control showed no arrow in four clicks each.
+The windowed result therefore does not prove that the patch fixes the fullscreen
+bug. No cursor patch is included in this release. Capture frame rates are not
+game-performance measurements.
+
+Severe lag remains unresolved. External fullscreen tests later reproduced long
+presentation gaps while macOS reported the game as foreground. Separate runs
+that lost foreground ownership were excluded. Successful short FPS measurements
+do not establish that these stalls are fixed.
 
 The known intermittent loader crash and reduced-precision limitations described
 in the [runtime notes](../experimental/arm64-fex/README.md) still apply. Large

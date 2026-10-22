@@ -109,6 +109,73 @@ sets reduced x87 precision for all its launched processes, including launchers.
 A macOS app wrapper should start this command detached and return; keeping the
 wrapper alive as Steam can make later app opens merely focus Steam.
 
+### Built-in display launcher
+
+`fullscreen-launcher.m` and `resize-client.c` automate the faster macOS
+fullscreen path with the game's `FullScreen=0`. The native helper enters macOS
+fullscreen, and the Windows helper corrects the client size that Wine initially
+clamps below the requested height. The helpers do not change display modes,
+graphics quality, game files, Wine libraries or saves. See the
+[graphics results and limits](../../docs/GRAPHICS.md).
+
+The existing runtime must have `run.py`, `logs/`, and `bin/`. Build the native
+helper with Apple's command-line developer tools and the Windows helper with
+a 32-bit MinGW-w64 compiler:
+
+```sh
+clang -fobjc-arc -Wall -Wextra -Werror \
+  -framework AppKit -framework CoreGraphics \
+  fullscreen-launcher.m -o fullscreen-launcher
+i686-w64-mingw32-gcc -Wall -Wextra -Werror -O2 -static-libgcc \
+  resize-client.c -o resize-client.exe
+```
+
+Place both outputs in the private runtime's `bin/` directory. Run:
+
+```sh
+/path/to/private-runtime/bin/fullscreen-launcher /path/to/private-runtime \
+  '/path/to/private-runtime/prefix/drive_c/users/USERNAME/Documents/THE SETTLERS 7 - History Edition/Options.ini'
+```
+
+The tested configuration uses `FullScreen=0`, `ScreenWidth=2056`,
+`ScreenHeight=1285`, and 16:10 (`AspectMode=5`). The built-in display must be the
+unmirrored primary display. Requested client dimensions must fit its work area.
+The helper validates the game's native process and Windows executable path;
+the Windows check expects Steam's standard installation path shown above.
+A different library location requires adapting that check deliberately.
+
+**Permission:** the native helper needs macOS Accessibility access. On the
+tested macOS version, the list is named **Device Control and Data Access**
+under Privacy & Security. This OS permission permits broad app control even
+though the source targets only Settlers. The helper requests permission through
+the standard macOS prompt. Without it, the game still launches normally in a
+window. Grant access only if comfortable with the source. Wait for the game
+window to appear, then reopen the launcher. Reopening before Steam finishes its
+pending launch can submit another launch request. Permission granted to a
+terminal or controller does not automatically apply to a separately launched
+app.
+
+The helper waits up to three minutes for the actual game window, sizes it, then
+exits. It does not remain running during play. Steam and Ubisoft manage their
+own lifetimes. If they open the game after the timeout, reopen the launcher.
+A lock avoids concurrent setup attempts. Reopening a running game requests
+activation and reapplies sizing; it does not start another game instance.
+macOS can ignore background activation requests. Command-Tab was verified for
+normal user switching.
+
+A macOS app wrapper should detach the helper with `nohup`, log its output
+privately and return. Read that log if setup fails. A resize failure leaves the
+game open for manual correction; the helper does not stop Steam or the game.
+To remove this optional integration, restore the wrapper's normal `run.py`
+Steam launch command and remove the two helper binaries. The runtime and saves
+are independent of these helpers.
+
+The same startup operations were verified from an authorized controller,
+including save loading, exact client/rendering dimensions, gameplay and
+Command-Tab. A normal app launch correctly exposed the separate permission
+requirement and launched windowed without it. Normal app startup with its own
+permission is still pending verification.
+
 Keep the runtime outside temporary storage. Keep private logs and account
 state out of public reports. Updates to Wine/FEX/CEF require a new compatibility
 check; Steam verification or a game update can replace the custom codec.

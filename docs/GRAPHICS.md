@@ -113,12 +113,33 @@ the recommended fix.
 
 Selecting the supported 2056 x 1285 display mode through native CoreGraphics
 before starting the game kept the display, guest client and Metal surface at
-2056 x 1285. Visible clicks and loading the saved match worked without a later
-resize correction. A temporary launcher that holds this mode for the game
-process also released it after normal game exit, restoring the original desktop
-mode. Normal app startup, gameplay performance and cursor behavior for this
-launcher remain unverified, so it is not included as a recommended launcher.
-The manual `FullScreen=0` workflow above remains the measured fallback.
+2056 x 1285. Visible clicks, save loading, normal Command-Tab return, menu and
+camera input, and normal exit with temporary-mode release all passed. Four
+clicks in a short recording showed no Mac arrow in the inspected frames.
+However, a fresh same-day comparison favored macOS fullscreen:
+
+| Mode, same save and quality | Stationary | Camera route 1 | Camera route 2 |
+| --- | ---: | ---: | ---: |
+| Game fullscreen (`FullScreen=1`), native mode selected first | 53.8 fps | 39.2 fps | 47.7 fps |
+| macOS fullscreen (`FullScreen=0`), manual resolution reapply | 61.8 fps | 59.3 fps | 62.0 fps |
+| macOS fullscreen, automatic native entry and client-size correction | 61.9 fps | 58.7 fps | 61.3 fps |
+
+All runs used the same High/Medium, particles-off preset with depth of field
+**on** and verified 2056 x 1285 Metal surfaces. The true-fullscreen run differed
+only in its FullScreen option. Stationary coverage was 95 percent; camera
+coverage varied from 79 to 99 percent. Longest retained display intervals were
+190 ms for true fullscreen, 37 ms for the manual control and 53 ms for the
+automatic native-entry trial. These short sequential comparisons support
+keeping `FullScreen=0`; they do not establish a universal performance ratio.
+
+The automatic native-entry trial used Accessibility to enter macOS fullscreen,
+then a narrowly targeted Win32 `SetWindowPos` operation to restore the initially
+clamped 2056 x 1262 client to 2056 x 1285. It did not change the display mode or
+require an in-game resolution reapply. Save loading, normal app switching, menu
+clicks and camera movement passed. Optional helper sources and the separate
+macOS permission requirement are described in the
+[runtime notes](../experimental/arm64-fex/README.md#built-in-display-launcher).
+The normal app launcher still needs an end-to-end check with its own permission.
 
 The per-game Wine `EmulateModeset=Y` alternative failed before rendering with a
 `make_ratio` assertion in `sysparams.c`; the test setting was removed. It is not
